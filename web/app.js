@@ -103,19 +103,90 @@ function handleViewForm(event) {
   event.preventDefault();
   const form = event.currentTarget;
   const folder = form.folder.value.trim();
-  const pattern = form.pattern.value.trim();
-  const content = form.content.value.trim();
+  const patterns = splitLines(form.patterns.value);
+  const includeTerms = splitLines(form.include.value);
+  const excludeTerms = splitLines(form.exclude.value);
   const caseInsensitive = form.caseInsensitive.checked;
-  if (!folder || !pattern || !content) {
-    renderCommand(viewOutput, '请输入完整的参数');
+  const showPath = form.showPath.checked;
+  const showLine = form.showLine.checked;
+  const exportFile = form.exportFile.checked;
+
+  if (!folder) {
+    renderCommand(viewOutput, '请输入目标文件夹');
     return;
   }
-  const command = ['grep', '-R', '-n'];
-  if (caseInsensitive) {
-    command.push('-i');
+
+  if (!includeTerms.length && !excludeTerms.length) {
+    renderCommand(viewOutput, '请至少填写“包含”或“不包含”其中一项');
+    return;
   }
-  command.push('--include', shellQuote(pattern), shellQuote(content), shellQuote(folder));
-  renderCommand(viewOutput, joinCommand(command));
+
+  const patternFlags = [];
+  patterns.forEach((pattern) => {
+    patternFlags.push('--include', shellQuote(pattern));
+  });
+
+  const includeFlags = [];
+  if (caseInsensitive) {
+    includeFlags.push('-i');
+  }
+  includeTerms.forEach((term) => {
+    includeFlags.push('-e', shellQuote(term));
+  });
+
+  const excludeFlags = [];
+  if (caseInsensitive) {
+    excludeFlags.push('-i');
+  }
+  excludeTerms.forEach((term) => {
+    excludeFlags.push('-e', shellQuote(term));
+  });
+
+  let commandString = '';
+
+  if (includeTerms.length) {
+    const listParts = ['grep', '-R', '-l'];
+    listParts.push(...patternFlags, ...includeFlags, shellQuote(folder));
+
+    if (!excludeTerms.length) {
+      const searchParts = ['grep', '-R'];
+      if (showLine) {
+        searchParts.push('-n');
+      }
+      searchParts.push(showPath ? '-H' : '-h');
+      searchParts.push(...patternFlags, ...includeFlags, shellQuote(folder));
+      commandString = joinCommand(searchParts);
+    } else {
+      const excludeParts = ['xargs', '-r', 'grep', '-L'];
+      excludeParts.push(...excludeFlags);
+      const finalParts = ['xargs', '-r', 'grep'];
+      if (showLine) {
+        finalParts.push('-n');
+      }
+      finalParts.push(showPath ? '-H' : '-h');
+      if (caseInsensitive && !finalParts.includes('-i')) {
+        finalParts.push('-i');
+      }
+      includeTerms.forEach((term) => {
+        finalParts.push('-e', shellQuote(term));
+      });
+      commandString = [
+        joinCommand(listParts),
+        joinCommand(excludeParts),
+        joinCommand(finalParts),
+      ].join(' | ');
+    }
+  } else {
+    const excludeOnlyParts = ['grep', '-R', '-L'];
+    excludeOnlyParts.push(...patternFlags, ...excludeFlags, shellQuote(folder));
+    commandString = joinCommand(excludeOnlyParts);
+  }
+
+  if (exportFile) {
+    commandString = `(${commandString}) > "view_$(date +%Y%m%d_%H%M%S).txt"`;
+  }
+
+  renderCommand(viewOutput, commandString);
 }
 
 function splitLines(value) {

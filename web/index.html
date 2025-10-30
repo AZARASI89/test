@@ -55,16 +55,44 @@
             <input type="text" name="folder" required placeholder="例如：/tmp/project" />
           </label>
           <label>
-            文件名（支持通配符）
-            <input type="text" name="pattern" required placeholder="例如：*.py" />
+            文件名匹配（换行分隔，支持通配符）
+            <textarea
+              name="patterns"
+              rows="3"
+              placeholder="例如：*.sql\n*.conf"
+            ></textarea>
           </label>
           <label>
-            搜索内容
-            <input type="text" name="content" required placeholder="例如：TODO" />
+            包含的内容（换行分隔）
+            <textarea
+              name="include"
+              rows="3"
+              placeholder="例如：ERROR\nTimeout"
+            ></textarea>
+          </label>
+          <label>
+            不包含的内容（换行分隔）
+            <textarea
+              name="exclude"
+              rows="3"
+              placeholder="例如：DEBUG"
+            ></textarea>
           </label>
           <label class="checkbox">
             <input type="checkbox" name="caseInsensitive" /> 忽略大小写
           </label>
+          <label class="checkbox">
+            <input type="checkbox" name="showPath" checked /> 显示文件路径
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="showLine" checked /> 显示匹配行号
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="exportFile" /> 输出到 txt 文件
+          </label>
+          <p class="form-hint">
+            至少填写“包含”或“不包含”其中一项；若仅填写“不包含”，将生成列出不含指定文本的文件命令。
+          </p>
           <button type="submit">生成命令</button>
         </form>
         <output id="view-output" class="command-output" aria-live="polite"></output>
