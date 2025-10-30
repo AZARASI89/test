@@ -306,6 +306,701 @@
           </div>
         </details>
       </section>
+
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">05</span>
+              <span>
+                <strong data-i18n="tools.log.name">ログと出力を分析</strong>
+                <span class="tool-desc" data-i18n="tools.log.desc">
+                  tail や集計など 4 種類のログ操作をまとめて生成
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="log-form" class="command-form">
+              <label>
+                <span data-i18n="log.modeLabel">操作を選択</span>
+                <select name="mode" id="log-mode">
+                  <option value="tail" data-i18n="log.mode.tail">リアルタイム追跡</option>
+                  <option value="extract" data-i18n="log.mode.extract">フィールド抽出</option>
+                  <option value="hotspot" data-i18n="log.mode.hotspot">出現頻度を集計</option>
+                  <option value="segment" data-i18n="log.mode.segment">区間を抽出</option>
+                </select>
+              </label>
+              <fieldset class="mode-group" data-mode="tail">
+                <legend data-i18n="log.tail.legend">リアルタイム追跡</legend>
+                <label>
+                  <span data-i18n="log.tail.fileLabel">ログファイル</span>
+                  <input type="text" name="tailFile" placeholder="例：/var/log/app.log" data-i18n-placeholder="log.tail.filePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="log.tail.linesLabel">表示行数</span>
+                  <input type="number" name="tailLines" min="1" placeholder="200" data-i18n-placeholder="log.tail.linesPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="log.tail.includeLabel">含めるキーワード</span>
+                  <textarea name="tailInclude" rows="2" placeholder="例：ERROR\nTimeout" data-i18n-placeholder="log.tail.includePlaceholder"></textarea>
+                  <span class="field-hint" data-i18n="log.tail.includeHint">改行で複数指定</span>
+                </label>
+                <label>
+                  <span data-i18n="log.tail.excludeLabel">除外キーワード</span>
+                  <textarea name="tailExclude" rows="2" placeholder="例：DEBUG" data-i18n-placeholder="log.tail.excludePlaceholder"></textarea>
+                  <span class="field-hint" data-i18n="log.tail.excludeHint">空欄で制限なし</span>
+                </label>
+                <div class="option-row">
+                  <label class="checkbox">
+                    <input type="checkbox" name="tailFollow" checked />
+                    <span data-i18n="log.tail.follow">tail -f で追跡</span>
+                  </label>
+                  <label class="checkbox">
+                    <input type="checkbox" name="tailHighlight" />
+                    <span data-i18n="log.tail.highlight">grep で強調表示</span>
+                  </label>
+                </div>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="extract" hidden>
+                <legend data-i18n="log.extract.legend">フィールド抽出</legend>
+                <label>
+                  <span data-i18n="shared.sourceLabel">入力元</span>
+                  <select name="extractSourceType">
+                    <option value="file" data-i18n="shared.sourceOption.file">ファイル</option>
+                    <option value="command" data-i18n="shared.sourceOption.command">コマンド</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="log.extract.sourceLabel">ソース</span>
+                  <input type="text" name="extractSource" placeholder="例：/var/log/app.log" data-i18n-placeholder="log.extract.sourcePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="log.extract.toolLabel">抽出ツール</span>
+                  <select name="extractTool" id="extract-tool">
+                    <option value="awk" data-i18n="log.extract.tool.awk">awk</option>
+                    <option value="cut" data-i18n="log.extract.tool.cut">cut</option>
+                    <option value="jq" data-i18n="log.extract.tool.jq">jq</option>
+                  </select>
+                </label>
+                <div class="extract-group" data-tool="awk">
+                  <label>
+                    <span data-i18n="log.extract.awkScriptLabel">awk スクリプト</span>
+                    <textarea name="extractAwkScript" rows="3" placeholder="例：{print $1, $5}" data-i18n-placeholder="log.extract.awkScriptPlaceholder"></textarea>
+                  </label>
+                  <label>
+                    <span data-i18n="log.extract.delimiterLabel">区切り文字（任意）</span>
+                    <input type="text" name="extractAwkDelimiter" placeholder="," data-i18n-placeholder="log.extract.delimiterPlaceholder" />
+                  </label>
+                </div>
+                <div class="extract-group" data-tool="cut" hidden>
+                  <label>
+                    <span data-i18n="log.extract.delimiterLabel">区切り文字（任意）</span>
+                    <input type="text" name="extractCutDelimiter" placeholder="," data-i18n-placeholder="log.extract.delimiterPlaceholder" />
+                  </label>
+                  <label>
+                    <span data-i18n="log.extract.cutFieldsLabel">フィールド指定</span>
+                    <input type="text" name="extractCutFields" placeholder="1,3-5" data-i18n-placeholder="log.extract.cutFieldsPlaceholder" />
+                  </label>
+                </div>
+                <div class="extract-group" data-tool="jq" hidden>
+                  <label>
+                    <span data-i18n="log.extract.jqFilterLabel">jq フィルター</span>
+                    <input type="text" name="extractJqFilter" placeholder="例：.level" data-i18n-placeholder="log.extract.jqFilterPlaceholder" />
+                  </label>
+                </div>
+                <p class="form-hint" data-i18n="log.extract.hint">入力元がコマンドの場合は括弧で包んで実行します。</p>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="hotspot" hidden>
+                <legend data-i18n="log.hotspot.legend">出現頻度を集計</legend>
+                <label>
+                  <span data-i18n="log.hotspot.fileLabel">対象ファイル</span>
+                  <input type="text" name="hotspotFile" placeholder="例：/var/log/app.log" data-i18n-placeholder="log.hotspot.filePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="log.hotspot.filterLabel">キーワードフィルター（任意）</span>
+                  <input type="text" name="hotspotFilter" placeholder="例：ERROR" data-i18n-placeholder="log.hotspot.filterPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="log.hotspot.topLabel">上位 N 件</span>
+                  <input type="number" name="hotspotTop" min="1" placeholder="20" data-i18n-placeholder="log.hotspot.topPlaceholder" />
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="hotspotIgnoreCase" />
+                  <span data-i18n="log.hotspot.ignoreCase">大文字小文字を無視</span>
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="segment" hidden>
+                <legend data-i18n="log.segment.legend">区間を抽出</legend>
+                <label>
+                  <span data-i18n="log.segment.fileLabel">対象ファイル</span>
+                  <input type="text" name="segmentFile" placeholder="例：/var/log/app.log" data-i18n-placeholder="log.segment.filePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="log.segment.modeLabel">抽出方法</span>
+                  <select name="segmentMode">
+                    <option value="lines" data-i18n="log.segment.mode.lines">行番号で指定</option>
+                    <option value="patterns" data-i18n="log.segment.mode.patterns">キーワードで指定</option>
+                  </select>
+                </label>
+                <div class="segment-group" data-mode="lines">
+                  <label>
+                    <span data-i18n="log.segment.startLineLabel">開始行</span>
+                    <input type="number" name="segmentStartLine" min="1" />
+                  </label>
+                  <label>
+                    <span data-i18n="log.segment.endLineLabel">終了行（任意）</span>
+                    <input type="number" name="segmentEndLine" min="1" />
+                  </label>
+                </div>
+                <div class="segment-group" data-mode="patterns" hidden>
+                  <label>
+                    <span data-i18n="log.segment.startPatternLabel">開始キーワード</span>
+                    <input type="text" name="segmentStartPattern" placeholder="例：START" data-i18n-placeholder="log.segment.startPatternPlaceholder" />
+                  </label>
+                  <label>
+                    <span data-i18n="log.segment.endPatternLabel">終了キーワード（任意）</span>
+                    <input type="text" name="segmentEndPattern" placeholder="例：END" data-i18n-placeholder="log.segment.endPatternPlaceholder" />
+                  </label>
+                </div>
+                <label class="checkbox">
+                  <input type="checkbox" name="segmentExport" />
+                  <span data-i18n="log.segment.export">結果をファイルに保存</span>
+                </label>
+                <label>
+                  <span data-i18n="log.segment.prefixLabel">ファイル名プレフィックス</span>
+                  <input type="text" name="segmentPrefix" placeholder="segment" data-i18n-placeholder="log.segment.prefixPlaceholder" />
+                </label>
+              </fieldset>
+              <button type="submit" data-i18n="log.submit">コマンドを生成</button>
+            </form>
+            <output id="log-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
+      </section>
+
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">06</span>
+              <span>
+                <strong data-i18n="tools.system.name">システム状況を確認</strong>
+                <span class="tool-desc" data-i18n="tools.system.desc">
+                  ディスク、プロセス、ポート、健康診断のコマンドを生成
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="system-form" class="command-form">
+              <label>
+                <span data-i18n="system.modeLabel">操作を選択</span>
+                <select name="mode" id="system-mode">
+                  <option value="disk" data-i18n="system.mode.disk">ディスク/容量</option>
+                  <option value="process" data-i18n="system.mode.process">プロセス</option>
+                  <option value="ports" data-i18n="system.mode.ports">ポート/接続</option>
+                  <option value="snapshot" data-i18n="system.mode.snapshot">システムスナップショット</option>
+                </select>
+              </label>
+              <fieldset class="mode-group" data-mode="disk">
+                <legend data-i18n="system.disk.legend">ディスク/容量</legend>
+                <label class="checkbox">
+                  <input type="checkbox" name="diskDf" checked />
+                  <span data-i18n="system.disk.df">df -h を実行</span>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="diskDu" checked />
+                  <span data-i18n="system.disk.du">du -h を実行</span>
+                </label>
+                <label>
+                  <span data-i18n="system.disk.pathLabel">対象パス（du）</span>
+                  <input type="text" name="diskPath" placeholder="例：/var/log" data-i18n-placeholder="system.disk.pathPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="system.disk.depthLabel">表示階層（任意）</span>
+                  <input type="number" name="diskDepth" min="0" placeholder="1" data-i18n-placeholder="system.disk.depthPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="system.disk.thresholdLabel">サイズしきい値（任意）</span>
+                  <input type="number" name="diskThreshold" min="0" placeholder="100" data-i18n-placeholder="system.disk.thresholdPlaceholder" />
+                  <span class="field-hint" data-i18n="system.disk.thresholdHint">MB 単位で指定</span>
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="process" hidden>
+                <legend data-i18n="system.process.legend">プロセス</legend>
+                <label>
+                  <span data-i18n="system.process.userLabel">ユーザー（任意）</span>
+                  <input type="text" name="processUser" placeholder="例：app" data-i18n-placeholder="system.process.userPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="system.process.patternLabel">検索キーワード（任意）</span>
+                  <input type="text" name="processPattern" placeholder="例：java" data-i18n-placeholder="system.process.patternPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="system.process.sortLabel">ソート基準</span>
+                  <select name="processSort">
+                    <option value="cpu" data-i18n="system.process.sort.cpu">CPU 使用率</option>
+                    <option value="mem" data-i18n="system.process.sort.mem">メモリ使用率</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="system.process.limitLabel">表示件数（任意）</span>
+                  <input type="number" name="processLimit" min="1" placeholder="20" data-i18n-placeholder="system.process.limitPlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="ports" hidden>
+                <legend data-i18n="system.ports.legend">ポート/接続</legend>
+                <label>
+                  <span data-i18n="system.ports.toolLabel">ツール</span>
+                  <select name="portsTool">
+                    <option value="lsof" data-i18n="system.ports.tool.lsof">lsof</option>
+                    <option value="ss" data-i18n="system.ports.tool.ss">ss</option>
+                    <option value="netstat" data-i18n="system.ports.tool.netstat">netstat</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="system.ports.portLabel">ポート番号（任意）</span>
+                  <input type="text" name="portsPort" placeholder="例：8080" data-i18n-placeholder="system.ports.portPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="system.ports.protocolLabel">プロトコル</span>
+                  <select name="portsProtocol">
+                    <option value="all" data-i18n="system.ports.protocol.all">すべて</option>
+                    <option value="tcp" data-i18n="system.ports.protocol.tcp">TCP</option>
+                    <option value="udp" data-i18n="system.ports.protocol.udp">UDP</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="system.ports.processLabel">プロセス名（任意）</span>
+                  <input type="text" name="portsProcess" placeholder="例：nginx" data-i18n-placeholder="system.ports.processPlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="snapshot" hidden>
+                <legend data-i18n="system.snapshot.legend">システムスナップショット</legend>
+                <label class="checkbox">
+                  <input type="checkbox" name="snapshotUptime" checked />
+                  <span data-i18n="system.snapshot.uptime">uptime</span>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="snapshotFree" checked />
+                  <span data-i18n="system.snapshot.free">free -h</span>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="snapshotDf" />
+                  <span data-i18n="system.snapshot.df">df -h</span>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="snapshotIostat" />
+                  <span data-i18n="system.snapshot.iostat">iostat -xz 1 3</span>
+                </label>
+              </fieldset>
+              <button type="submit" data-i18n="system.submit">コマンドを生成</button>
+            </form>
+            <output id="system-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
+      </section>
+
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">07</span>
+              <span>
+                <strong data-i18n="tools.batch.name">ファイルを一括処理</strong>
+                <span class="tool-desc" data-i18n="tools.batch.desc">
+                  find 実行、リネーム、アーカイブ、差分比較をまとめて生成
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="batch-form" class="command-form">
+              <label>
+                <span data-i18n="batch.modeLabel">操作を選択</span>
+                <select name="mode" id="batch-mode">
+                  <option value="executor" data-i18n="batch.mode.executor">条件付き実行</option>
+                  <option value="rename" data-i18n="batch.mode.rename">一括リネーム/移動</option>
+                  <option value="archive" data-i18n="batch.mode.archive">アーカイブ/同期</option>
+                  <option value="diff" data-i18n="batch.mode.diff">差分比較</option>
+                </select>
+              </label>
+              <fieldset class="mode-group" data-mode="executor">
+                <legend data-i18n="batch.executor.legend">条件付き実行</legend>
+                <label>
+                  <span data-i18n="batch.executor.folderLabel">起点フォルダー</span>
+                  <input type="text" name="execFolder" placeholder="例：/tmp/project" data-i18n-placeholder="batch.executor.folderPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.executor.patternLabel">ファイル名パターン（任意）</span>
+                  <textarea name="execPatterns" rows="2" placeholder="例：*.log" data-i18n-placeholder="batch.executor.patternPlaceholder"></textarea>
+                </label>
+                <label>
+                  <span data-i18n="batch.executor.daysLabel">更新日数（任意）</span>
+                  <input type="number" name="execDays" min="0" placeholder="7" data-i18n-placeholder="batch.executor.daysPlaceholder" />
+                  <span class="field-hint" data-i18n="batch.executor.daysHint">N 日以内に更新されたファイル</span>
+                </label>
+                <label>
+                  <span data-i18n="batch.executor.sizeLabel">サイズ条件（任意）</span>
+                  <input type="text" name="execSize" placeholder="例：+5M" data-i18n-placeholder="batch.executor.sizePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.executor.commandLabel">実行コマンド</span>
+                  <input type="text" name="execCommand" placeholder="例：chmod 640 {}" data-i18n-placeholder="batch.executor.commandPlaceholder" />
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="execDryRun" />
+                  <span data-i18n="batch.executor.dryRun">実行せずパスを表示</span>
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="rename" hidden>
+                <legend data-i18n="batch.rename.legend">一括リネーム/移動</legend>
+                <label>
+                  <span data-i18n="batch.rename.folderLabel">対象フォルダー</span>
+                  <input type="text" name="renameFolder" placeholder="例：/tmp/images" data-i18n-placeholder="batch.rename.folderPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.rename.patternLabel">対象パターン（任意）</span>
+                  <input type="text" name="renamePattern" placeholder="例：*.jpg" data-i18n-placeholder="batch.rename.patternPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.rename.modeLabel">操作モード</span>
+                  <select name="renameMode">
+                    <option value="prefix" data-i18n="batch.rename.mode.prefix">プレフィックス追加</option>
+                    <option value="suffix" data-i18n="batch.rename.mode.suffix">サフィックス追加</option>
+                    <option value="replace" data-i18n="batch.rename.mode.replace">正規表現置換</option>
+                    <option value="move" data-i18n="batch.rename.mode.move">別フォルダーへ移動</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="batch.rename.valueLabel">追加/置換文字列</span>
+                  <input type="text" name="renameValue" placeholder="例：archived_" data-i18n-placeholder="batch.rename.valuePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.rename.replaceLabel">検索パターン（任意）</span>
+                  <input type="text" name="renameSearch" placeholder="例：(.*)" data-i18n-placeholder="batch.rename.replacePlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="archive" hidden>
+                <legend data-i18n="batch.archive.legend">アーカイブ/同期</legend>
+                <label>
+                  <span data-i18n="batch.archive.toolLabel">方式</span>
+                  <select name="archiveTool">
+                    <option value="tar" data-i18n="batch.archive.tool.tar">tar</option>
+                    <option value="zip" data-i18n="batch.archive.tool.zip">zip</option>
+                    <option value="rsync" data-i18n="batch.archive.tool.rsync">rsync</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="batch.archive.sourceLabel">ソース</span>
+                  <input type="text" name="archiveSource" placeholder="例：/tmp/project" data-i18n-placeholder="batch.archive.sourcePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.archive.targetLabel">出力先</span>
+                  <input type="text" name="archiveTarget" placeholder="例：backup.tar.gz" data-i18n-placeholder="batch.archive.targetPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.archive.excludeLabel">除外パターン（任意）</span>
+                  <textarea name="archiveExclude" rows="2" placeholder="例：node_modules" data-i18n-placeholder="batch.archive.excludePlaceholder"></textarea>
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="diff" hidden>
+                <legend data-i18n="batch.diff.legend">差分比較</legend>
+                <label>
+                  <span data-i18n="batch.diff.leftLabel">左側パス</span>
+                  <input type="text" name="diffLeft" placeholder="例：/path/old" data-i18n-placeholder="batch.diff.leftPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="batch.diff.rightLabel">右側パス</span>
+                  <input type="text" name="diffRight" placeholder="例：/path/new" data-i18n-placeholder="batch.diff.rightPlaceholder" />
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="diffRecursive" checked />
+                  <span data-i18n="batch.diff.recursive">ディレクトリを再帰的に比較</span>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="diffPatch" />
+                  <span data-i18n="batch.diff.patch">パッチを作成</span>
+                </label>
+              </fieldset>
+              <button type="submit" data-i18n="batch.submit">コマンドを生成</button>
+            </form>
+            <output id="batch-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
+      </section>
+
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">08</span>
+              <span>
+                <strong data-i18n="tools.security.name">セキュリティと権限</strong>
+                <span class="tool-desc" data-i18n="tools.security.desc">
+                  権限変更、SSH、ハッシュ、ACL のテンプレートを生成
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="security-form" class="command-form">
+              <label>
+                <span data-i18n="security.modeLabel">操作を選択</span>
+                <select name="mode" id="security-mode">
+                  <option value="chmod" data-i18n="security.mode.chmod">権限変更</option>
+                  <option value="ssh" data-i18n="security.mode.ssh">SSH/ファイル転送</option>
+                  <option value="hash" data-i18n="security.mode.hash">ハッシュ/署名</option>
+                  <option value="acl" data-i18n="security.mode.acl">ACL 操作</option>
+                </select>
+              </label>
+              <fieldset class="mode-group" data-mode="chmod">
+                <legend data-i18n="security.chmod.legend">権限変更</legend>
+                <label>
+                  <span data-i18n="security.chmod.pathLabel">対象パス</span>
+                  <textarea name="chmodPaths" rows="2" placeholder="例：/var/www
+/var/log/app.log" data-i18n-placeholder="security.chmod.pathPlaceholder"></textarea>
+                </label>
+                <label>
+                  <span data-i18n="security.chmod.modeLabel">chmod/chown 指定</span>
+                  <input type="text" name="chmodMode" placeholder="例：chmod -R 750" data-i18n-placeholder="security.chmod.modePlaceholder" />
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="chmodDryRun" />
+                  <span data-i18n="security.chmod.dryRun">適用前に確認（-print）</span>
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="ssh" hidden>
+                <legend data-i18n="security.ssh.legend">SSH/ファイル転送</legend>
+                <label>
+                  <span data-i18n="security.ssh.userLabel">ユーザー</span>
+                  <input type="text" name="sshUser" placeholder="例：deploy" data-i18n-placeholder="security.ssh.userPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="security.ssh.hostLabel">ホスト</span>
+                  <input type="text" name="sshHost" placeholder="例：example.com" data-i18n-placeholder="security.ssh.hostPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="security.ssh.portLabel">ポート（任意）</span>
+                  <input type="number" name="sshPort" min="1" max="65535" placeholder="22" data-i18n-placeholder="security.ssh.portPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="security.ssh.identityLabel">秘密鍵パス（任意）</span>
+                  <input type="text" name="sshIdentity" placeholder="例：~/.ssh/id_rsa" data-i18n-placeholder="security.ssh.identityPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="security.ssh.proxyLabel">踏み台（任意）</span>
+                  <input type="text" name="sshProxy" placeholder="user@bastion" data-i18n-placeholder="security.ssh.proxyPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="security.ssh.commandLabel">追加コマンド/転送</span>
+                  <input type="text" name="sshCommand" placeholder="例：scp local remote:/tmp" data-i18n-placeholder="security.ssh.commandPlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="hash" hidden>
+                <legend data-i18n="security.hash.legend">ハッシュ/署名</legend>
+                <label>
+                  <span data-i18n="security.hash.algorithmLabel">アルゴリズム</span>
+                  <select name="hashAlgorithm">
+                    <option value="sha256">SHA-256</option>
+                    <option value="sha1">SHA-1</option>
+                    <option value="md5">MD5</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="security.hash.pathLabel">対象パス</span>
+                  <textarea name="hashPaths" rows="2" placeholder="例：/tmp/file.iso" data-i18n-placeholder="security.hash.pathPlaceholder"></textarea>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="hashRecursive" />
+                  <span data-i18n="security.hash.recursive">再帰的に処理</span>
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="acl" hidden>
+                <legend data-i18n="security.acl.legend">ACL 操作</legend>
+                <label>
+                  <span data-i18n="security.acl.modeLabel">操作</span>
+                  <select name="aclAction">
+                    <option value="view" data-i18n="security.acl.mode.view">ACL を表示</option>
+                    <option value="set" data-i18n="security.acl.mode.set">ACL を設定</option>
+                    <option value="clone" data-i18n="security.acl.mode.clone">ACL を複製</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="security.acl.targetLabel">対象パス</span>
+                  <input type="text" name="aclTarget" placeholder="例：/var/www" data-i18n-placeholder="security.acl.targetPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="security.acl.ruleLabel">ACL ルール/参照パス</span>
+                  <input type="text" name="aclRule" placeholder="例：u:app:rwx" data-i18n-placeholder="security.acl.rulePlaceholder" />
+                </label>
+              </fieldset>
+              <button type="submit" data-i18n="security.submit">コマンドを生成</button>
+            </form>
+            <output id="security-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
+      </section>
+
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">09</span>
+              <span>
+                <strong data-i18n="tools.hdfs.name">HDFS を操作</strong>
+                <span class="tool-desc" data-i18n="tools.hdfs.desc">
+                  ブラウズ、内容確認、転送、メンテナンス、診断コマンドを生成
+                </span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="hdfs-form" class="command-form">
+              <label>
+                <span data-i18n="hdfs.modeLabel">操作を選択</span>
+                <select name="mode" id="hdfs-mode">
+                  <option value="browse" data-i18n="hdfs.mode.browse">ブラウズ/統計</option>
+                  <option value="content" data-i18n="hdfs.mode.content">内容を確認</option>
+                  <option value="transfer" data-i18n="hdfs.mode.transfer">アップロード/ダウンロード</option>
+                  <option value="modify" data-i18n="hdfs.mode.modify">属性・副本を変更</option>
+                  <option value="manage" data-i18n="hdfs.mode.manage">ディレクトリ管理</option>
+                  <option value="diagnostics" data-i18n="hdfs.mode.diagnostics">診断/ヘルスチェック</option>
+                </select>
+              </label>
+              <fieldset class="mode-group" data-mode="browse">
+                <legend data-i18n="hdfs.browse.legend">ブラウズ/統計</legend>
+                <label>
+                  <span data-i18n="hdfs.browse.pathLabel">HDFS パス</span>
+                  <input type="text" name="browsePath" placeholder="例：/data/app" data-i18n-placeholder="hdfs.browse.pathPlaceholder" />
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="browseLs" checked />
+                  <span data-i18n="hdfs.browse.ls">hdfs dfs -ls</span>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="browseDu" />
+                  <span data-i18n="hdfs.browse.du">hdfs dfs -du -h</span>
+                </label>
+                <label class="checkbox">
+                  <input type="checkbox" name="browseCount" />
+                  <span data-i18n="hdfs.browse.count">hdfs dfs -count -q</span>
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="content" hidden>
+                <legend data-i18n="hdfs.content.legend">内容を確認</legend>
+                <label>
+                  <span data-i18n="hdfs.content.pathLabel">HDFS パス</span>
+                  <input type="text" name="contentPath" placeholder="例：/logs/app.log" data-i18n-placeholder="hdfs.content.pathPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="hdfs.content.modeLabel">方法</span>
+                  <select name="contentMode">
+                    <option value="cat" data-i18n="hdfs.content.mode.cat">cat</option>
+                    <option value="tail" data-i18n="hdfs.content.mode.tail">tail -f</option>
+                    <option value="text" data-i18n="hdfs.content.mode.text">text</option>
+                    <option value="grep" data-i18n="hdfs.content.mode.grep">grep</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="hdfs.content.patternLabel">キーワード（任意）</span>
+                  <input type="text" name="contentPattern" placeholder="例：ERROR" data-i18n-placeholder="hdfs.content.patternPlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="transfer" hidden>
+                <legend data-i18n="hdfs.transfer.legend">アップロード/ダウンロード</legend>
+                <label>
+                  <span data-i18n="hdfs.transfer.directionLabel">操作</span>
+                  <select name="transferMode">
+                    <option value="put" data-i18n="hdfs.transfer.mode.put">put / copyFromLocal</option>
+                    <option value="get" data-i18n="hdfs.transfer.mode.get">get / copyToLocal</option>
+                    <option value="getmerge" data-i18n="hdfs.transfer.mode.getmerge">getmerge</option>
+                    <option value="cp" data-i18n="hdfs.transfer.mode.cp">HDFS 内部コピー</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="hdfs.transfer.localLabel">ローカルパス</span>
+                  <input type="text" name="transferLocal" placeholder="例：./data.csv" data-i18n-placeholder="hdfs.transfer.localPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="hdfs.transfer.remoteLabel">HDFS パス</span>
+                  <input type="text" name="transferRemote" placeholder="例：/data/data.csv" data-i18n-placeholder="hdfs.transfer.remotePlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="modify" hidden>
+                <legend data-i18n="hdfs.modify.legend">属性・副本を変更</legend>
+                <label>
+                  <span data-i18n="hdfs.modify.actionLabel">操作</span>
+                  <select name="modifyAction">
+                    <option value="append" data-i18n="hdfs.modify.action.append">appendToFile</option>
+                    <option value="setrep" data-i18n="hdfs.modify.action.setrep">setrep</option>
+                    <option value="chmod" data-i18n="hdfs.modify.action.chmod">chmod/chown</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="hdfs.modify.sourceLabel">ローカルパス/値</span>
+                  <input type="text" name="modifySource" placeholder="例：./append.txt" data-i18n-placeholder="hdfs.modify.sourcePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="hdfs.modify.targetLabel">HDFS パス</span>
+                  <input type="text" name="modifyTarget" placeholder="例：/data/log.txt" data-i18n-placeholder="hdfs.modify.targetPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="hdfs.modify.extraLabel">追加オプション（任意）</span>
+                  <input type="text" name="modifyExtra" placeholder="例：-R 2" data-i18n-placeholder="hdfs.modify.extraPlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="manage" hidden>
+                <legend data-i18n="hdfs.manage.legend">ディレクトリ管理</legend>
+                <label>
+                  <span data-i18n="hdfs.manage.actionLabel">操作</span>
+                  <select name="manageAction">
+                    <option value="mkdir" data-i18n="hdfs.manage.action.mkdir">mkdir</option>
+                    <option value="mv" data-i18n="hdfs.manage.action.mv">mv</option>
+                    <option value="rm" data-i18n="hdfs.manage.action.rm">rm -r</option>
+                    <option value="rmskip" data-i18n="hdfs.manage.action.rmskip">rm -r -skipTrash</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="hdfs.manage.sourceLabel">ソース</span>
+                  <input type="text" name="manageSource" placeholder="例：/tmp/input" data-i18n-placeholder="hdfs.manage.sourcePlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="hdfs.manage.targetLabel">ターゲット（任意）</span>
+                  <input type="text" name="manageTarget" placeholder="例：/data/input" data-i18n-placeholder="hdfs.manage.targetPlaceholder" />
+                </label>
+              </fieldset>
+              <fieldset class="mode-group" data-mode="diagnostics" hidden>
+                <legend data-i18n="hdfs.diagnostics.legend">診断/ヘルスチェック</legend>
+                <label>
+                  <span data-i18n="hdfs.diagnostics.actionLabel">操作</span>
+                  <select name="diagnosticsAction">
+                    <option value="report" data-i18n="hdfs.diagnostics.action.report">dfsadmin -report</option>
+                    <option value="fsck" data-i18n="hdfs.diagnostics.action.fsck">fsck</option>
+                    <option value="test" data-i18n="hdfs.diagnostics.action.test">dfs -test</option>
+                  </select>
+                </label>
+                <label>
+                  <span data-i18n="hdfs.diagnostics.pathLabel">対象パス（任意）</span>
+                  <input type="text" name="diagnosticsPath" placeholder="例：/data/app" data-i18n-placeholder="hdfs.diagnostics.pathPlaceholder" />
+                </label>
+                <label>
+                  <span data-i18n="hdfs.diagnostics.testFlagLabel">-test フラグ</span>
+                  <select name="diagnosticsTestFlag">
+                    <option value="-e">-e (存在確認)</option>
+                    <option value="-d">-d (ディレクトリ)</option>
+                    <option value="-z">-z (空か確認)</option>
+                  </select>
+                </label>
+              </fieldset>
+              <button type="submit" data-i18n="hdfs.submit">コマンドを生成</button>
+            </form>
+            <output id="hdfs-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
+      </section>
+
     </main>
 
     <template id="command-template">

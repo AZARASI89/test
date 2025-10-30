@@ -279,6 +279,16 @@ label {
   font-weight: 500;
 }
 
+.option-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.option-row .checkbox {
+  margin: 0;
+}
+
 .form-hint {
   margin: 0;
   font-size: 0.85rem;
@@ -286,6 +296,7 @@ label {
 }
 
 input[type='text'],
+input[type='number'],
 textarea {
   border-radius: 0.75rem;
   border: 1px solid rgba(15, 23, 42, 0.15);
@@ -296,7 +307,23 @@ textarea {
 }
 
 input[type='text']:focus,
+input[type='number']:focus,
 textarea:focus {
+  border-color: rgba(29, 78, 216, 0.6);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.2);
+}
+
+select {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.85);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+select:focus {
   border-color: rgba(29, 78, 216, 0.6);
   outline: none;
   box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.2);
