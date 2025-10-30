@@ -1,17 +1,29 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="ja">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>实用命令生成器</title>
+    <title>実用コマンドジェネレーター</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <header>
-      <h1>实用命令生成器</h1>
-      <p>
-        根据输入的参数自动生成常用的 Shell 命令，省去手写命令的烦恼。
-      </p>
+      <div class="header-inner">
+        <div class="header-text">
+          <h1 data-i18n="header.title">実用コマンドジェネレーター</h1>
+          <p data-i18n="header.subtitle">
+            入力した条件からシェルコマンドを自動生成し、作業を素早く完了できます。
+          </p>
+        </div>
+        <div class="language-switcher">
+          <label for="language-select" data-i18n="language.label">言語</label>
+          <select id="language-select" aria-label="言語">
+            <option value="ja" selected>日本語</option>
+            <option value="en">English</option>
+            <option value="zh">简体中文</option>
+          </select>
+        </div>
+      </div>
     </header>
 
     <main class="tool-list">
@@ -21,27 +33,38 @@
             <span class="tool-meta">
               <span class="tool-index">01</span>
               <span>
-                <strong>统计文件数量</strong>
-                <span class="tool-desc">支持多种文件名模式的筛选</span>
+                <strong data-i18n="tools.count.name">ファイル数を集計</strong>
+                <span class="tool-desc" data-i18n="tools.count.desc">
+                  複数のパターンで指定したファイルをカウント
+                </span>
               </span>
             </span>
           </summary>
           <div class="tool-body">
             <form id="count-form" class="command-form">
               <label>
-                目标文件夹
-                <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+                <span data-i18n="count.folderLabel">対象フォルダー</span>
+                <input
+                  type="text"
+                  name="folder"
+                  required
+                  placeholder="例：/tmp/project"
+                  data-i18n-placeholder="count.folderPlaceholder"
+                />
               </label>
               <label>
-                文件名匹配（可选，换行分隔）
+                <span data-i18n="count.patternLabel">ファイル名パターン（任意・改行区切り）</span>
                 <textarea
                   name="patterns"
                   rows="2"
-                  placeholder="例如：*.txt\n*.log"
+                  placeholder="例：*.txt\n*.log"
+                  data-i18n-placeholder="count.patternPlaceholder"
                 ></textarea>
-                <span class="field-hint">支持多个通配符模式</span>
+                <span class="field-hint" data-i18n="count.patternHint">
+                  ワイルドカードを複数行で指定できます
+                </span>
               </label>
-              <button type="submit">生成命令</button>
+              <button type="submit" data-i18n="count.submit">コマンドを生成</button>
             </form>
             <output id="count-output" class="command-output" aria-live="polite"></output>
           </div>
@@ -54,28 +77,39 @@
             <span class="tool-meta">
               <span class="tool-index">02</span>
               <span>
-                <strong>查找文件</strong>
-                <span class="tool-desc">一次匹配 *.conf、*.sql 等多种后缀</span>
+                <strong data-i18n="tools.find.name">ファイルを検索</strong>
+                <span class="tool-desc" data-i18n="tools.find.desc">
+                  一度に *.conf や *.sql などを検索
+                </span>
               </span>
             </span>
           </summary>
           <div class="tool-body">
             <form id="find-form" class="command-form">
               <label>
-                起始文件夹
-                <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+                <span data-i18n="find.folderLabel">起点フォルダー</span>
+                <input
+                  type="text"
+                  name="folder"
+                  required
+                  placeholder="例：/tmp/project"
+                  data-i18n-placeholder="find.folderPlaceholder"
+                />
               </label>
               <label>
-                文件名匹配（必填，换行分隔）
+                <span data-i18n="find.patternLabel">ファイル名パターン（必須・改行区切り）</span>
                 <textarea
                   name="patterns"
                   rows="2"
                   required
-                  placeholder="例如：*.conf\n*.sql"
+                  placeholder="例：*.conf\n*.sql"
+                  data-i18n-placeholder="find.patternPlaceholder"
                 ></textarea>
-                <span class="field-hint">至少填写一个通配符模式</span>
+                <span class="field-hint" data-i18n="find.patternHint">
+                  少なくとも1つのパターンを入力してください
+                </span>
               </label>
-              <button type="submit">生成命令</button>
+              <button type="submit" data-i18n="find.submit">コマンドを生成</button>
             </form>
             <output id="find-output" class="command-output" aria-live="polite"></output>
           </div>
@@ -88,8 +122,10 @@
             <span class="tool-meta">
               <span class="tool-index">03</span>
               <span>
-                <strong>检索文件内容</strong>
-                <span class="tool-desc">多条件筛选、可导出查询结果</span>
+                <strong data-i18n="tools.view.name">ファイル内容を検索</strong>
+                <span class="tool-desc" data-i18n="tools.view.desc">
+                  条件を組み合わせて結果をテキスト出力
+                </span>
               </span>
             </span>
           </summary>
@@ -97,66 +133,85 @@
             <form id="view-form" class="command-form">
               <div class="form-sections">
                 <fieldset>
-                  <legend>文件范围</legend>
+                  <legend data-i18n="view.scopeLegend">ファイル範囲</legend>
                   <label>
-                    起始文件夹
-                    <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+                    <span data-i18n="view.folderLabel">起点フォルダー</span>
+                    <input
+                      type="text"
+                      name="folder"
+                      required
+                      placeholder="例：/tmp/project"
+                      data-i18n-placeholder="view.folderPlaceholder"
+                    />
                   </label>
                   <label>
-                    文件名匹配
+                    <span data-i18n="view.patternLabel">ファイル名パターン</span>
                     <textarea
                       name="patterns"
                       rows="3"
-                      placeholder="例如：*.sql\n*.conf"
+                      placeholder="例：*.sql\n*.conf"
+                      data-i18n-placeholder="view.patternPlaceholder"
                     ></textarea>
-                    <span class="field-hint">支持多个模式，换行分隔</span>
+                    <span class="field-hint" data-i18n="view.patternHint">
+                      改行で複数指定できます
+                    </span>
                   </label>
                 </fieldset>
                 <fieldset>
-                  <legend>内容条件</legend>
+                  <legend data-i18n="view.contentLegend">内容条件</legend>
                   <div class="textarea-pair">
                     <label>
-                      包含的内容
+                      <span data-i18n="view.includeLabel">含める語句</span>
                       <textarea
                         name="include"
                         rows="3"
-                        placeholder="例如：ERROR\nTimeout"
+                        placeholder="例：ERROR\nTimeout"
+                        data-i18n-placeholder="view.includePlaceholder"
                       ></textarea>
-                      <span class="field-hint">可填写多个关键字，换行分隔</span>
+                      <span class="field-hint" data-i18n="view.includeHint">
+                        キーワードを改行で追加できます
+                      </span>
                     </label>
                     <label>
-                      不包含的内容
+                      <span data-i18n="view.excludeLabel">除外する語句</span>
                       <textarea
                         name="exclude"
                         rows="3"
-                        placeholder="例如：DEBUG"
+                        placeholder="例：DEBUG"
+                        data-i18n-placeholder="view.excludePlaceholder"
                       ></textarea>
-                      <span class="field-hint">留空表示不限制</span>
+                      <span class="field-hint" data-i18n="view.excludeHint">
+                        空欄の場合は制限しません
+                      </span>
                     </label>
                   </div>
                 </fieldset>
               </div>
               <fieldset class="options">
-                <legend>输出设置</legend>
+                <legend data-i18n="view.outputLegend">出力設定</legend>
                 <div class="toggle-grid">
                   <label class="checkbox">
-                    <input type="checkbox" name="caseInsensitive" /> 忽略大小写
+                    <input type="checkbox" name="caseInsensitive" />
+                    <span data-i18n="view.option.caseInsensitive">大文字小文字を区別しない</span>
                   </label>
                   <label class="checkbox">
-                    <input type="checkbox" name="showPath" checked /> 显示文件路径
+                    <input type="checkbox" name="showPath" checked />
+                    <span data-i18n="view.option.showPath">ファイルパスを表示</span>
                   </label>
                   <label class="checkbox">
-                    <input type="checkbox" name="showLine" checked /> 显示匹配行号
+                    <input type="checkbox" name="showLine" checked />
+                    <span data-i18n="view.option.showLine">行番号を表示</span>
                   </label>
                   <label class="checkbox">
-                    <input type="checkbox" name="exportFile" /> 输出到 txt 文件
+                    <input type="checkbox" name="exportFile" />
+                    <span data-i18n="view.option.exportFile">結果を txt に出力</span>
                   </label>
                 </div>
               </fieldset>
-              <p class="form-hint">
-                至少填写“包含”或“不包含”其中一项；若仅填写“不包含”，将生成列出不含指定文本的文件命令。
+              <p class="form-hint" data-i18n="view.formHint">
+                「含める」か「除外する」のいずれかを入力してください。除外のみの場合は指定語句を含まないファイルを列挙します。
               </p>
-              <button type="submit">生成命令</button>
+              <button type="submit" data-i18n="view.submit">コマンドを生成</button>
             </form>
             <output id="view-output" class="command-output" aria-live="polite"></output>
           </div>
@@ -169,50 +224,83 @@
             <span class="tool-meta">
               <span class="tool-index">04</span>
               <span>
-                <strong>批量替换内容</strong>
-                <span class="tool-desc">可创建备份并随时一键还原</span>
+                <strong data-i18n="tools.replace.name">内容を一括置換</strong>
+                <span class="tool-desc" data-i18n="tools.replace.desc">
+                  バックアップ作成とワンクリック復元に対応
+                </span>
               </span>
             </span>
           </summary>
           <div class="tool-body">
             <form id="replace-form" class="command-form">
               <label>
-                搜索内容
-                <input type="text" name="search" placeholder="需要替换的文本" />
+                <span data-i18n="replace.searchLabel">検索する文字列</span>
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="置き換えたいテキスト"
+                  data-i18n-placeholder="replace.searchPlaceholder"
+                />
               </label>
               <label>
-                替换为
-                <input type="text" name="replace" placeholder="新的文本" />
+                <span data-i18n="replace.replaceLabel">置換後の文字列</span>
+                <input
+                  type="text"
+                  name="replace"
+                  placeholder="新しいテキスト"
+                  data-i18n-placeholder="replace.replacePlaceholder"
+                />
               </label>
               <details class="target-details">
-                <summary>目标文件（可多选）</summary>
+                <summary data-i18n="replace.targetSummary">対象ファイルを指定</summary>
                 <label>
-                  文件路径（换行分隔）
-                  <textarea name="files" rows="3" placeholder="例如：/tmp/a.txt"></textarea>
+                  <span data-i18n="replace.fileListLabel">ファイルパス（改行区切り）</span>
+                  <textarea
+                    name="files"
+                    rows="3"
+                    placeholder="例：/tmp/a.txt"
+                    data-i18n-placeholder="replace.fileListPlaceholder"
+                  ></textarea>
                 </label>
                 <label>
-                  目标文件夹
-                  <input type="text" name="folder" placeholder="例如：/tmp/project" />
+                  <span data-i18n="replace.folderLabel">対象フォルダー</span>
+                  <input
+                    type="text"
+                    name="folder"
+                    placeholder="例：/tmp/project"
+                    data-i18n-placeholder="replace.folderPlaceholder"
+                  />
                 </label>
                 <label>
-                  文件匹配（换行分隔，支持通配符）
-                  <textarea name="patterns" rows="3" placeholder="例如：*.py"></textarea>
+                  <span data-i18n="replace.patternLabel">ファイルパターン（改行区切り）</span>
+                  <textarea
+                    name="patterns"
+                    rows="3"
+                    placeholder="例：*.py"
+                    data-i18n-placeholder="replace.patternPlaceholder"
+                  ></textarea>
                 </label>
               </details>
               <label class="checkbox">
-                <input type="checkbox" name="useRegex" /> 使用正则表达式
+                <input type="checkbox" name="useRegex" />
+                <span data-i18n="replace.useRegex">正規表現を使用</span>
               </label>
               <label class="checkbox">
-                <input type="checkbox" name="caseInsensitive" /> 忽略大小写
+                <input type="checkbox" name="caseInsensitive" />
+                <span data-i18n="replace.caseInsensitive">大文字小文字を無視</span>
               </label>
               <label class="checkbox">
-                <input type="checkbox" name="keepBackup" /> 保留原文件（生成 .bak）
+                <input type="checkbox" name="keepBackup" />
+                <span data-i18n="replace.keepBackup">置換前に .bak を保存</span>
               </label>
               <label class="checkbox">
-                <input type="checkbox" name="restoreBackup" /> 还原 .bak 文件（撤销替换）
+                <input type="checkbox" name="restoreBackup" />
+                <span data-i18n="replace.restoreBackup">.bak を復元して置換を取り消す</span>
               </label>
-              <p class="form-hint">勾选“还原”时，将忽略上方的搜索与替换内容，仅根据指定目标还原 .bak 备份。</p>
-              <button type="submit">生成命令</button>
+              <p class="form-hint" data-i18n="replace.hint">
+                「復元」を選ぶと上の検索条件は無視され、指定した対象にある .bak ファイルを元に戻します。
+              </p>
+              <button type="submit" data-i18n="replace.submit">コマンドを生成</button>
             </form>
             <output id="replace-output" class="command-output" aria-live="polite"></output>
           </div>
@@ -223,7 +311,15 @@
     <template id="command-template">
       <div class="command-card">
         <code></code>
-        <button type="button" class="copy-button" aria-label="复制命令">复制</button>
+        <button
+          type="button"
+          class="copy-button"
+          data-i18n="actions.copy"
+          aria-label="コピー"
+          data-i18n-aria-label="actions.copyLabel"
+        >
+          コピー
+        </button>
       </div>
     </template>
 
