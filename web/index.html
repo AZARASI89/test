@@ -50,46 +50,64 @@
       <section>
         <h2>3. 检索文件内容</h2>
         <form id="view-form" class="command-form">
-          <label>
-            起始文件夹
-            <input type="text" name="folder" required placeholder="例如：/tmp/project" />
-          </label>
-          <label>
-            文件名匹配（换行分隔，支持通配符）
-            <textarea
-              name="patterns"
-              rows="3"
-              placeholder="例如：*.sql\n*.conf"
-            ></textarea>
-          </label>
-          <label>
-            包含的内容（换行分隔）
-            <textarea
-              name="include"
-              rows="3"
-              placeholder="例如：ERROR\nTimeout"
-            ></textarea>
-          </label>
-          <label>
-            不包含的内容（换行分隔）
-            <textarea
-              name="exclude"
-              rows="3"
-              placeholder="例如：DEBUG"
-            ></textarea>
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" name="caseInsensitive" /> 忽略大小写
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" name="showPath" checked /> 显示文件路径
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" name="showLine" checked /> 显示匹配行号
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" name="exportFile" /> 输出到 txt 文件
-          </label>
+          <div class="form-sections">
+            <fieldset>
+              <legend>文件范围</legend>
+              <label>
+                起始文件夹
+                <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+              </label>
+              <label>
+                文件名匹配
+                <textarea
+                  name="patterns"
+                  rows="3"
+                  placeholder="例如：*.sql\n*.conf"
+                ></textarea>
+                <span class="field-hint">支持多个模式，换行分隔</span>
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>内容条件</legend>
+              <div class="textarea-pair">
+                <label>
+                  包含的内容
+                  <textarea
+                    name="include"
+                    rows="3"
+                    placeholder="例如：ERROR\nTimeout"
+                  ></textarea>
+                  <span class="field-hint">可填写多个关键字，换行分隔</span>
+                </label>
+                <label>
+                  不包含的内容
+                  <textarea
+                    name="exclude"
+                    rows="3"
+                    placeholder="例如：DEBUG"
+                  ></textarea>
+                  <span class="field-hint">留空表示不限制</span>
+                </label>
+              </div>
+            </fieldset>
+          </div>
+          <fieldset class="options">
+            <legend>输出设置</legend>
+            <div class="toggle-grid">
+              <label class="checkbox">
+                <input type="checkbox" name="caseInsensitive" /> 忽略大小写
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" name="showPath" checked /> 显示文件路径
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" name="showLine" checked /> 显示匹配行号
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" name="exportFile" /> 输出到 txt 文件
+              </label>
+            </div>
+          </fieldset>
           <p class="form-hint">
             至少填写“包含”或“不包含”其中一项；若仅填写“不包含”，将生成列出不含指定文本的文件命令。
           </p>
