@@ -55,11 +55,29 @@ function renderCommand(target, command) {
   target.appendChild(node);
 }
 
+function buildFindPatternParts(patterns) {
+  if (!patterns.length) {
+    return [];
+  }
+  if (patterns.length === 1) {
+    return ['-name', shellQuote(patterns[0])];
+  }
+  const parts = ['\\('];
+  patterns.forEach((pattern, index) => {
+    if (index > 0) {
+      parts.push('-o');
+    }
+    parts.push('-name', shellQuote(pattern));
+  });
+  parts.push('\\)');
+  return parts;
+}
+
 function handleCountForm(event) {
   event.preventDefault();
   const form = event.currentTarget;
   const folder = form.folder.value.trim();
-  const pattern = form.pattern.value.trim();
+  const patterns = splitLines(form.patterns.value);
   if (!folder) {
     renderCommand(countOutput, '请输入目标文件夹');
     return;
@@ -72,9 +90,7 @@ function handleCountForm(event) {
     '-type',
     'f',
   ];
-  if (pattern) {
-    command.push('-name', shellQuote(pattern));
-  }
+  command.push(...buildFindPatternParts(patterns));
   command.push('|', 'wc', '-l');
   renderCommand(countOutput, joinCommand(command));
 }
@@ -83,19 +99,18 @@ function handleFindForm(event) {
   event.preventDefault();
   const form = event.currentTarget;
   const folder = form.folder.value.trim();
-  const pattern = form.pattern.value.trim();
-  if (!folder || !pattern) {
-    renderCommand(findOutput, '请输入完整的参数');
+  const patterns = splitLines(form.patterns.value);
+  if (!folder) {
+    renderCommand(findOutput, '请输入起始文件夹');
     return;
   }
-  const command = joinCommand([
-    'find',
-    shellQuote(folder),
-    '-type',
-    'f',
-    '-name',
-    shellQuote(pattern),
-  ]);
+  if (!patterns.length) {
+    renderCommand(findOutput, '请至少提供一个文件名匹配模式');
+    return;
+  }
+  const commandParts = ['find', shellQuote(folder), '-type', 'f'];
+  commandParts.push(...buildFindPatternParts(patterns));
+  const command = joinCommand(commandParts);
   renderCommand(findOutput, command);
 }
 
@@ -289,3 +304,17 @@ countForm.addEventListener('submit', handleCountForm);
 findForm.addEventListener('submit', handleFindForm);
 viewForm.addEventListener('submit', handleViewForm);
 replaceForm.addEventListener('submit', handleReplaceForm);
+
+const toolPanels = document.querySelectorAll('.tool-panel');
+toolPanels.forEach((panel) => {
+  panel.addEventListener('toggle', () => {
+    if (!panel.open) {
+      return;
+    }
+    toolPanels.forEach((other) => {
+      if (other !== panel) {
+        other.removeAttribute('open');
+      }
+    });
+  });
+});

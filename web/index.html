@@ -14,150 +14,209 @@
       </p>
     </header>
 
-    <main>
-      <section>
-        <h2>1. 统计文件数量</h2>
-        <form id="count-form" class="command-form">
-          <label>
-            目标文件夹
-            <input type="text" name="folder" required placeholder="例如：/tmp/project" />
-          </label>
-          <label>
-            文件名（可选，支持通配符）
-            <input type="text" name="pattern" placeholder="例如：*.txt" />
-          </label>
-          <button type="submit">生成命令</button>
-        </form>
-        <output id="count-output" class="command-output" aria-live="polite"></output>
+    <main class="tool-list">
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">01</span>
+              <span>
+                <strong>统计文件数量</strong>
+                <span class="tool-desc">支持多种文件名模式的筛选</span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="count-form" class="command-form">
+              <label>
+                目标文件夹
+                <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+              </label>
+              <label>
+                文件名匹配（可选，换行分隔）
+                <textarea
+                  name="patterns"
+                  rows="2"
+                  placeholder="例如：*.txt\n*.log"
+                ></textarea>
+                <span class="field-hint">支持多个通配符模式</span>
+              </label>
+              <button type="submit">生成命令</button>
+            </form>
+            <output id="count-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
       </section>
 
-      <section>
-        <h2>2. 查找文件</h2>
-        <form id="find-form" class="command-form">
-          <label>
-            起始文件夹
-            <input type="text" name="folder" required placeholder="例如：/tmp/project" />
-          </label>
-          <label>
-            文件名（支持通配符）
-            <input type="text" name="pattern" required placeholder="例如：*.py" />
-          </label>
-          <button type="submit">生成命令</button>
-        </form>
-        <output id="find-output" class="command-output" aria-live="polite"></output>
-      </section>
-
-      <section>
-        <h2>3. 检索文件内容</h2>
-        <form id="view-form" class="command-form">
-          <div class="form-sections">
-            <fieldset>
-              <legend>文件范围</legend>
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">02</span>
+              <span>
+                <strong>查找文件</strong>
+                <span class="tool-desc">一次匹配 *.conf、*.sql 等多种后缀</span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="find-form" class="command-form">
               <label>
                 起始文件夹
                 <input type="text" name="folder" required placeholder="例如：/tmp/project" />
               </label>
               <label>
-                文件名匹配
+                文件名匹配（必填，换行分隔）
                 <textarea
                   name="patterns"
-                  rows="3"
-                  placeholder="例如：*.sql\n*.conf"
+                  rows="2"
+                  required
+                  placeholder="例如：*.conf\n*.sql"
                 ></textarea>
-                <span class="field-hint">支持多个模式，换行分隔</span>
+                <span class="field-hint">至少填写一个通配符模式</span>
               </label>
-            </fieldset>
-            <fieldset>
-              <legend>内容条件</legend>
-              <div class="textarea-pair">
-                <label>
-                  包含的内容
-                  <textarea
-                    name="include"
-                    rows="3"
-                    placeholder="例如：ERROR\nTimeout"
-                  ></textarea>
-                  <span class="field-hint">可填写多个关键字，换行分隔</span>
-                </label>
-                <label>
-                  不包含的内容
-                  <textarea
-                    name="exclude"
-                    rows="3"
-                    placeholder="例如：DEBUG"
-                  ></textarea>
-                  <span class="field-hint">留空表示不限制</span>
-                </label>
-              </div>
-            </fieldset>
+              <button type="submit">生成命令</button>
+            </form>
+            <output id="find-output" class="command-output" aria-live="polite"></output>
           </div>
-          <fieldset class="options">
-            <legend>输出设置</legend>
-            <div class="toggle-grid">
+        </details>
+      </section>
+
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">03</span>
+              <span>
+                <strong>检索文件内容</strong>
+                <span class="tool-desc">多条件筛选、可导出查询结果</span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="view-form" class="command-form">
+              <div class="form-sections">
+                <fieldset>
+                  <legend>文件范围</legend>
+                  <label>
+                    起始文件夹
+                    <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+                  </label>
+                  <label>
+                    文件名匹配
+                    <textarea
+                      name="patterns"
+                      rows="3"
+                      placeholder="例如：*.sql\n*.conf"
+                    ></textarea>
+                    <span class="field-hint">支持多个模式，换行分隔</span>
+                  </label>
+                </fieldset>
+                <fieldset>
+                  <legend>内容条件</legend>
+                  <div class="textarea-pair">
+                    <label>
+                      包含的内容
+                      <textarea
+                        name="include"
+                        rows="3"
+                        placeholder="例如：ERROR\nTimeout"
+                      ></textarea>
+                      <span class="field-hint">可填写多个关键字，换行分隔</span>
+                    </label>
+                    <label>
+                      不包含的内容
+                      <textarea
+                        name="exclude"
+                        rows="3"
+                        placeholder="例如：DEBUG"
+                      ></textarea>
+                      <span class="field-hint">留空表示不限制</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+              <fieldset class="options">
+                <legend>输出设置</legend>
+                <div class="toggle-grid">
+                  <label class="checkbox">
+                    <input type="checkbox" name="caseInsensitive" /> 忽略大小写
+                  </label>
+                  <label class="checkbox">
+                    <input type="checkbox" name="showPath" checked /> 显示文件路径
+                  </label>
+                  <label class="checkbox">
+                    <input type="checkbox" name="showLine" checked /> 显示匹配行号
+                  </label>
+                  <label class="checkbox">
+                    <input type="checkbox" name="exportFile" /> 输出到 txt 文件
+                  </label>
+                </div>
+              </fieldset>
+              <p class="form-hint">
+                至少填写“包含”或“不包含”其中一项；若仅填写“不包含”，将生成列出不含指定文本的文件命令。
+              </p>
+              <button type="submit">生成命令</button>
+            </form>
+            <output id="view-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
+      </section>
+
+      <section class="tool">
+        <details class="tool-panel">
+          <summary>
+            <span class="tool-meta">
+              <span class="tool-index">04</span>
+              <span>
+                <strong>批量替换内容</strong>
+                <span class="tool-desc">可创建备份并随时一键还原</span>
+              </span>
+            </span>
+          </summary>
+          <div class="tool-body">
+            <form id="replace-form" class="command-form">
+              <label>
+                搜索内容
+                <input type="text" name="search" placeholder="需要替换的文本" />
+              </label>
+              <label>
+                替换为
+                <input type="text" name="replace" placeholder="新的文本" />
+              </label>
+              <details class="target-details">
+                <summary>目标文件（可多选）</summary>
+                <label>
+                  文件路径（换行分隔）
+                  <textarea name="files" rows="3" placeholder="例如：/tmp/a.txt"></textarea>
+                </label>
+                <label>
+                  目标文件夹
+                  <input type="text" name="folder" placeholder="例如：/tmp/project" />
+                </label>
+                <label>
+                  文件匹配（换行分隔，支持通配符）
+                  <textarea name="patterns" rows="3" placeholder="例如：*.py"></textarea>
+                </label>
+              </details>
+              <label class="checkbox">
+                <input type="checkbox" name="useRegex" /> 使用正则表达式
+              </label>
               <label class="checkbox">
                 <input type="checkbox" name="caseInsensitive" /> 忽略大小写
               </label>
               <label class="checkbox">
-                <input type="checkbox" name="showPath" checked /> 显示文件路径
+                <input type="checkbox" name="keepBackup" /> 保留原文件（生成 .bak）
               </label>
               <label class="checkbox">
-                <input type="checkbox" name="showLine" checked /> 显示匹配行号
+                <input type="checkbox" name="restoreBackup" /> 还原 .bak 文件（撤销替换）
               </label>
-              <label class="checkbox">
-                <input type="checkbox" name="exportFile" /> 输出到 txt 文件
-              </label>
-            </div>
-          </fieldset>
-          <p class="form-hint">
-            至少填写“包含”或“不包含”其中一项；若仅填写“不包含”，将生成列出不含指定文本的文件命令。
-          </p>
-          <button type="submit">生成命令</button>
-        </form>
-        <output id="view-output" class="command-output" aria-live="polite"></output>
-      </section>
-
-      <section>
-        <h2>4. 批量替换内容</h2>
-        <form id="replace-form" class="command-form">
-          <label>
-            搜索内容
-            <input type="text" name="search" placeholder="需要替换的文本" />
-          </label>
-          <label>
-            替换为
-            <input type="text" name="replace" placeholder="新的文本" />
-          </label>
-          <details>
-            <summary>目标文件（可多选）</summary>
-            <label>
-              文件路径（换行分隔）
-              <textarea name="files" rows="3" placeholder="例如：/tmp/a.txt"></textarea>
-            </label>
-            <label>
-              目标文件夹
-              <input type="text" name="folder" placeholder="例如：/tmp/project" />
-            </label>
-            <label>
-              文件匹配（换行分隔，支持通配符）
-              <textarea name="patterns" rows="3" placeholder="例如：*.py"></textarea>
-            </label>
-          </details>
-          <label class="checkbox">
-            <input type="checkbox" name="useRegex" /> 使用正则表达式
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" name="caseInsensitive" /> 忽略大小写
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" name="keepBackup" /> 保留原文件（生成 .bak）
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" name="restoreBackup" /> 还原 .bak 文件（撤销替换）
-          </label>
-          <p class="form-hint">勾选“还原”时，将忽略上方的搜索与替换内容，仅根据指定目标还原 .bak 备份。</p>
-          <button type="submit">生成命令</button>
-        </form>
-        <output id="replace-output" class="command-output" aria-live="polite"></output>
+              <p class="form-hint">勾选“还原”时，将忽略上方的搜索与替换内容，仅根据指定目标还原 .bak 备份。</p>
+              <button type="submit">生成命令</button>
+            </form>
+            <output id="replace-output" class="command-output" aria-live="polite"></output>
+          </div>
+        </details>
       </section>
     </main>
 
