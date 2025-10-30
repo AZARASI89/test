@@ -75,11 +75,11 @@
         <form id="replace-form" class="command-form">
           <label>
             搜索内容
-            <input type="text" name="search" required placeholder="需要替换的文本" />
+            <input type="text" name="search" placeholder="需要替换的文本" />
           </label>
           <label>
             替换为
-            <input type="text" name="replace" required placeholder="新的文本" />
+            <input type="text" name="replace" placeholder="新的文本" />
           </label>
           <details>
             <summary>目标文件（可多选）</summary>
@@ -102,6 +102,13 @@
           <label class="checkbox">
             <input type="checkbox" name="caseInsensitive" /> 忽略大小写
           </label>
+          <label class="checkbox">
+            <input type="checkbox" name="keepBackup" /> 保留原文件（生成 .bak）
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="restoreBackup" /> 还原 .bak 文件（撤销替换）
+          </label>
+          <p class="form-hint">勾选“还原”时，将忽略上方的搜索与替换内容，仅根据指定目标还原 .bak 备份。</p>
           <button type="submit">生成命令</button>
         </form>
         <output id="replace-output" class="command-output" aria-live="polite"></output>

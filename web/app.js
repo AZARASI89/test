@@ -135,6 +135,41 @@ function handleReplaceForm(event) {
   const patterns = splitLines(form.patterns.value);
   const useRegex = form.useRegex.checked;
   const caseSensitive = !form.caseInsensitive.checked;
+  const keepBackup = form.keepBackup.checked;
+  const restoreBackup = form.restoreBackup.checked;
+
+  if (restoreBackup) {
+    if (!fileList.length && !folder) {
+      renderCommand(replaceOutput, '请至少提供一个文件路径或目标文件夹');
+      return;
+    }
+
+    const commands = [];
+
+    if (fileList.length) {
+      const quotedFiles = fileList.map((file) => shellQuote(file)).join(' ');
+      const restoreLoop = `for target in ${quotedFiles}; do bak="${'$'}{target}.bak"; if [ -f "$bak" ]; then mv "$bak" "$target"; fi; done`;
+      commands.push(restoreLoop);
+    }
+
+    if (folder) {
+      const findParts = ['find', shellQuote(folder), '-type', 'f'];
+      if (patterns.length) {
+        const clauses = patterns
+          .map((pattern) => `-name ${shellQuote(`${pattern}.bak`)}`)
+          .join(' -o ');
+        findParts.push('\\(', clauses, '\\)');
+      } else {
+        findParts.push('-name', shellQuote('*.bak'));
+      }
+      const restoreScript = 'for path in "$@"; do target="${path%.bak}"; mv "$path" "$target"; done';
+      findParts.push('-exec', 'sh', '-c', shellQuote(restoreScript), 'sh', '{}', '+');
+      commands.push(joinCommand(findParts));
+    }
+
+    renderCommand(replaceOutput, commands.join(' && '));
+    return;
+  }
 
   if (!search) {
     renderCommand(replaceOutput, '请输入需要替换的内容');
@@ -148,11 +183,12 @@ function handleReplaceForm(event) {
 
   const sedScript = buildSedScript(search, replace, useRegex, caseSensitive);
   const quotedScript = shellQuote(sedScript);
+  const inplaceFlag = keepBackup ? '-i.bak' : '-i';
   const commands = [];
 
   if (fileList.length) {
     const quotedFiles = fileList.map((file) => shellQuote(file)).join(' ');
-    commands.push(`sed -i ${quotedScript} ${quotedFiles}`);
+    commands.push(`sed ${inplaceFlag} ${quotedScript} ${quotedFiles}`);
   }
 
   if (folder) {
@@ -161,7 +197,7 @@ function handleReplaceForm(event) {
       const clauses = patterns.map((pattern) => `-name ${shellQuote(pattern)}`).join(' -o ');
       findParts.push('\\(', clauses, '\\)');
     }
-    findParts.push('-exec', 'sed', '-i', quotedScript, '{}', '+');
+    findParts.push('-exec', 'sed', inplaceFlag, quotedScript, '{}', '+');
     commands.push(joinCommand(findParts));
   }
 

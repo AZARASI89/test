@@ -81,6 +81,12 @@ label {
   font-weight: 500;
 }
 
+.form-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
 input[type='text'],
 textarea {
   border-radius: 0.75rem;
