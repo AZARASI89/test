@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>实用命令生成器</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>实用命令生成器</h1>
+      <p>
+        根据输入的参数自动生成常用的 Shell 命令，省去手写命令的烦恼。
+      </p>
+    </header>
+
+    <main>
+      <section>
+        <h2>1. 统计文件数量</h2>
+        <form id="count-form" class="command-form">
+          <label>
+            目标文件夹
+            <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+          </label>
+          <label>
+            文件名（可选，支持通配符）
+            <input type="text" name="pattern" placeholder="例如：*.txt" />
+          </label>
+          <button type="submit">生成命令</button>
+        </form>
+        <output id="count-output" class="command-output" aria-live="polite"></output>
+      </section>
+
+      <section>
+        <h2>2. 查找文件</h2>
+        <form id="find-form" class="command-form">
+          <label>
+            起始文件夹
+            <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+          </label>
+          <label>
+            文件名（支持通配符）
+            <input type="text" name="pattern" required placeholder="例如：*.py" />
+          </label>
+          <button type="submit">生成命令</button>
+        </form>
+        <output id="find-output" class="command-output" aria-live="polite"></output>
+      </section>
+
+      <section>
+        <h2>3. 检索文件内容</h2>
+        <form id="view-form" class="command-form">
+          <label>
+            起始文件夹
+            <input type="text" name="folder" required placeholder="例如：/tmp/project" />
+          </label>
+          <label>
+            文件名（支持通配符）
+            <input type="text" name="pattern" required placeholder="例如：*.py" />
+          </label>
+          <label>
+            搜索内容
+            <input type="text" name="content" required placeholder="例如：TODO" />
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="caseInsensitive" /> 忽略大小写
+          </label>
+          <button type="submit">生成命令</button>
+        </form>
+        <output id="view-output" class="command-output" aria-live="polite"></output>
+      </section>
+
+      <section>
+        <h2>4. 批量替换内容</h2>
+        <form id="replace-form" class="command-form">
+          <label>
+            搜索内容
+            <input type="text" name="search" required placeholder="需要替换的文本" />
+          </label>
+          <label>
+            替换为
+            <input type="text" name="replace" required placeholder="新的文本" />
+          </label>
+          <details>
+            <summary>目标文件（可多选）</summary>
+            <label>
+              文件路径（换行分隔）
+              <textarea name="files" rows="3" placeholder="例如：/tmp/a.txt"></textarea>
+            </label>
+            <label>
+              目标文件夹
+              <input type="text" name="folder" placeholder="例如：/tmp/project" />
+            </label>
+            <label>
+              文件匹配（换行分隔，支持通配符）
+              <textarea name="patterns" rows="3" placeholder="例如：*.py"></textarea>
+            </label>
+          </details>
+          <label class="checkbox">
+            <input type="checkbox" name="useRegex" /> 使用正则表达式
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" name="caseInsensitive" /> 忽略大小写
+          </label>
+          <button type="submit">生成命令</button>
+        </form>
+        <output id="replace-output" class="command-output" aria-live="polite"></output>
+      </section>
+    </main>
+
+    <template id="command-template">
+      <div class="command-card">
+        <code></code>
+        <button type="button" class="copy-button" aria-label="复制命令">复制</button>
+      </div>
+    </template>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
