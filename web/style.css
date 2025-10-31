@@ -17,6 +17,10 @@ body {
   flex-direction: column;
 }
 
+*[hidden] {
+  display: none !important;
+}
+
 header {
   padding: 2rem 1.5rem 1rem;
   color: #f8fafc;
