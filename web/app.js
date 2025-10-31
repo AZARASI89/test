@@ -2414,7 +2414,9 @@ toolPanels.forEach((panel) => {
     }
     toolPanels.forEach((other) => {
       if (other !== panel) {
-        other.removeAttribute('open');
+        if (other.open) {
+          other.open = false;
+        }
       }
     });
   });
